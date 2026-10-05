@@ -110,18 +110,20 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            build || true
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            build
+
+          APP_PATH=$(find build/DerivedDataDevice -name "Keeper.app" | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Device Keeper.app not found!"
+            exit 1
+          fi
 
           mkdir -p output/Payload
-          APP_PATH=$(find build/DerivedDataDevice -name "Keeper.app" | head -n 1)
-          if [ -n "$APP_PATH" ]; then
-            cp -R "$APP_PATH" output/Payload/
-            cd output
-            zip -r Keeper.ipa Payload
-            rm -rf Payload
-          else
-            echo "Device Keeper.app not found!"
-          fi
+          cp -R "$APP_PATH" output/Payload/
+          cd output
+          zip -r Keeper.ipa Payload
+          rm -rf Payload
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
